@@ -40,13 +40,14 @@ Loss Function: MSE Loss (Mean Squared Error).
 ### Performance & Result
 
 Despite the extreme compression (1-bit precision), the model achieves competitive accuracy on the MNIST test set.
-
+```text
 Best Test Accuracy:                  91.37%
 Training Epochs:                     25
 Batch Size:                          64
 Optimization,SGD with Learning Rate: 0.001
+```text
 
-### Compression Efficiency
+## Compression Efficiency
 
 * Theoretical comparison between a standard FP32 model and this BNN:
 		Standard FP32 Weight: 32 bits.
