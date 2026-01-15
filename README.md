@@ -45,7 +45,7 @@ Best Test Accuracy:                  91.37%
 Training Epochs:                     25
 Batch Size:                          64
 Optimization,SGD with Learning Rate: 0.001
-```text
+```
 
 ## Compression Efficiency
 
