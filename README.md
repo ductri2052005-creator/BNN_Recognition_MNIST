@@ -35,49 +35,64 @@ Hidden Layer: 512 neurons, 1-bit Weights.
 Output Layer: 10 neurons (Classes 0-9).
 
 Loss Function: MSE Loss (Mean Squared Error).
+```
 
-Performance & Results
+### Performance & Result
 
 Despite the extreme compression (1-bit precision), the model achieves competitive accuracy on the MNIST test set.
 
-Best Test Accuracy:                  91.41%
+Best Test Accuracy:                  91.37%
 Training Epochs:                     25
 Batch Size:                          64
 Optimization,SGD with Learning Rate: 0.001
 
-Compression Efficiency
+### Compression Efficiency
 
-Theoretical comparison between a standard FP32 model and this BNN:
-Standard FP32 Weight: 32 bits.
-BNN Weight: 1 bit.
-Compression Ratio: ~32x reduction in model size.
+* Theoretical comparison between a standard FP32 model and this BNN:
+		Standard FP32 Weight: 32 bits.
+		BNN Weight: 1 bit.
+		Compression Ratio: ~32x reduction in model size.
 
-Mathematical Implementation (STE & Gradient Flow)
-Training BNNs is challenging because the derivative of the Sign function is 0 almost everywhere. This project implements the Straight-Through Estimator (STE) to approximate gradients during backpropagation.
+* Mathematical Implementation (STE & Gradient Flow)
+Training BNNs is challenging because the derivative of the Sign function is 0 almost everywhere.
+This project implements the Straight-Through Estimator (STE) to approximate gradients during backpropagation.
+	
+* Note on Batch Normalization: 
+This implementation intentionally does not use Batch Normalization layers. To compensate for this and ensure
+gradients can effectively propagate through all layers without vanishing, the STE saturation threshold was
+increased to 25. This adjustment ensures that the backpropagation process can successfully update weights across
+the entire depth of the network.
 
-Note on Batch Normalization: 
-This implementation intentionally does not use Batch Normalization layers. To compensate for this and ensure gradients can effectively propagate through all layers without vanishing, the STE saturation threshold was increased to 25. This adjustment ensures that the backpropagation process can successfully update weights across the entire depth of the network.
-
-How to Run
+		def backward(self, grad_output, mode, layer):
+			# Straight-Through Estimator with Threshold Clipping
+			# Only propagate gradients where input x is within the range [-25, 25]
+			grad_input = grad_output * (np.abs(self.x) <= 25) # <--- Increase Threshold up to 25.
+			return grad_input
+			
+## How to Run
 1. Clone the repository
-
+```text
 git clone [https://github.com/ductri2052005-creator/BNN_Recognition_MNIST.git](https://github.com/ductri2052005-creator/BNN_Recognition_MNIST.git)
 cd BNN_Recognition_MNIST
-
+```
 2. Install Dependencies
+```text
 pip install numpy torch torchvision
-
+```
 3. Run Training
+```text
 python BNN_code.py
-
+```
 (Note: If you are running on Google Colab, you can open BNN_USING_NUMPY.ipynb directly)
 
-Project Structure
-BNN_USING_NUMPY.ipynb: Jupyter Notebook containing the full training pipeline and analysis.
-src/: (Optional) Contains modularized python scripts.
-bnn_weights_1bit.npz: Exported 1-bit weights after training.
+## Project Structure
+* BNN_USING_NUMPY.ipynb: Jupyter Notebook containing the full training pipeline and analysis.
+* src/: (Optional) Contains modularized python scripts.
+* bnn_weights_1bit.npz: Exported 1-bit weights after training.
 
-Future Improvements
-Implement Convolutional Layers (Binary CNN) using NumPy im2col.
-Deploy the trained weights onto an FPGA (Zynq-7000) using Verilog/HLS.
-Optimize the threshold value for STE dynamically.
+## Future Improvements
+* Implement Convolutional Layers (Binary CNN) using NumPy im2col.
+* Deploy the trained weights onto an FPGA (Zynq-7000) using Verilog/HLS.
+* Optimize the threshold value for STE dynamically.
+
+Author: Nguyen Duc Tri Affiliation: IC Design Research Lab | HCMUTE - Ho Chi Minh City University of Technology and Engineering
